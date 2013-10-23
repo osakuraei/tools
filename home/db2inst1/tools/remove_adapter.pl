@@ -5,12 +5,12 @@ use strict;
 use Bio::SeqIO;
 my $rHoHoH ={};
 
-if (@ARGV!=3) {
-    die "please check input files: <fasta_file> <adatper_config_file> <SEQ_TAB_FILE>\n";
+if (@ARGV!=2) {
+    die "please check input files: <fasta_file>  <SEQ_TAB_FILE>\n";
 }
-
-open(CONFIG,"<", $ARGV[1]) or die "Please check your <adatper_config_file>\n";
-open(OUTPUTFILE,">", $ARGV[2]) or die "Please check your <SEQ_TAB_FILE>\n";
+my $config_file="/home/db2inst1/tools/attb_config";
+open(CONFIG,"<", $config_file) or die "Please check your <adatper_config_file>\n";
+open(OUTPUTFILE,">", $ARGV[1]) or die "Please check your <SEQ_TAB_FILE>\n";
 while (my $line=<CONFIG>)
 {
     chomp($line);
