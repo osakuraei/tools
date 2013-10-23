@@ -48,4 +48,5 @@ while(my $Line=<primer_file>)
 close primer_product;
 close primer_file;
 
-#this work has to be removed in the future
+#I see, please read
+#please read this file
