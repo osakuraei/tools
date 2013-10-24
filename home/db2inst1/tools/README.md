@@ -19,4 +19,3 @@ DON'T PANIC. THIS IS THE FIRST TIME I USE GIT.
 曾经闪光的不是手 留下的也不是手
 而是指间沙
 
-看看这首诗
