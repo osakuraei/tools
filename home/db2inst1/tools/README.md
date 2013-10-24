@@ -1,4 +1,4 @@
-DON'T PANIC. THIS IS THE FIRST TIME I USE GIT.
+DON'T BE  PANIC. THIS IS THE FIRST TIME I USE GIT.
 浮云终日行， 游子久不至。 
 三夜频梦君， 情亲见君意。 
 告归常局促， 苦道来不易： 
