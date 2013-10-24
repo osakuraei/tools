@@ -58,7 +58,7 @@ for my $key( sort keys %$hash_ref)
 
     my $cloned=$hash_ref->{$key}->{CLONE};
 
-    if (($cloned ne "-")&&($cloned>=1&&$cloned<=5))
+    if (($cloned ne "-")&&($cloned>=1&&$cloned<=4))
     {
 	    
 	my $price=`/home/shenc/bin/usaprice.sh $id`;
