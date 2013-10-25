@@ -3,7 +3,7 @@
   use DBI();
 if (@ARGV!=3)
 {
-    die "please check the parameters <primer_id_file> <Clone_Type> <outputfile>";
+    die "please check the parameters <primer_id_file> <Vector> <outputfile>";
 }
 
 open(PRIMER_ID,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS primer_id_file File";

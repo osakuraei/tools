@@ -17,11 +17,11 @@ while (my $seq=$inseq->next_seq)
     my $d_seq=$seq->seq();
     if ($d_seq ne "")
     {
-        print OUTPUTFILE $seq->primary_id,"\t",$d_seq,"\n";
+        print OUTPUTFILE $seq->primary_id,"\t",$d_seq,"\t",$seq->desc,"\n";
     }
     else
     {
-        print STDOUT $seq->primary_id,"\t","EMPTY SEQUENCE","\n";
+        print STDERR $seq->primary_id,"\t","EMPTY SEQUENCE","\n";
     }
     
 }
