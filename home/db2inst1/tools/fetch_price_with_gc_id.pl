@@ -5,7 +5,7 @@
   my $hash_ref={};
 if (@ARGV!=4)
 {
-    die "please check the parameters <gc_id_file> <Clone_Type> <Vector> <Outputfile>";
+    die "please check the parameters\n\t\t\t\t\n <gc_id_file> \t\t\t\t\n<Clone_Type, EX or GC>\t\t\t\t\n <Vector>\t\t\t\t\n <Outputfile>";
 }
 
 open(GENE_ID,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS GENE_ID File";
