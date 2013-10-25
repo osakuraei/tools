@@ -19,4 +19,5 @@ DON'T BE  PANIC. THIS IS THE FIRST TIME I USE GIT.
 曾经闪光的不是手 留下的也不是手
 而是指间沙
 
-The course of true love never did run smooth.
+In the End, we will remember not the words of our enemies, but the silence of our friends.
+----Martin Luther King, Jr.
