@@ -23,4 +23,4 @@ In the End, we will remember not the words of our enemies, but the silence of ou
 ----Martin Luther King, Jr.
 
 ごとぐと手（て）を结（むす）んだあの子（こ）は最期（さいご）.. 笑（わら）ってた 
-
+降（ふ）リ积（つ）もる雪（ゆき）たちは 
