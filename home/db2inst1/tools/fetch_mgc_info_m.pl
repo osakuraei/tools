@@ -50,7 +50,7 @@ sub p_get
                          {'RaiseError' => 1});
 		my $gene_id=shift @_;
 
-	  my $sql="SELECT template_id,COLLECTION_NAME,PLATE,ROW_POS,COL_POS,accession,mod_date,comment,sn,status,check_status,checker,check_date,mgc_status,placeno FROM _glz_mgc2gene WHERE gene_id = \'$gene_id\' OR template_id='$gene_id' OR accession = '$gene_id'";
+	  my $sql="SELECT gene_id, template_id,COLLECTION_NAME,PLATE,ROW_POS,COL_POS,accession,mod_date,comment,sn,status,check_status,checker,check_date,mgc_status,placeno FROM _glz_mgc2gene WHERE gene_id = \'$gene_id\' OR template_id='$gene_id' OR accession = '$gene_id'";
 	  my $sth = $dbh->prepare("$sql");
 	  $sth->execute();
 	  my $numRows = $sth->rows;
