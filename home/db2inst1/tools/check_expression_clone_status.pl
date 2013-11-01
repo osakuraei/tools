@@ -18,7 +18,7 @@ my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
 while (my $primer_id=<PRIMER_ID>)
 {
   chomp($primer_id);
-  my $sth = $dbh->prepare("select sn,primer_id,plasmid_place,plate_well,stock_place,vector from _cs_transfer_result where (vector like '%$clone_type%')and primer_id=\'$primer_id\' limit 1");
+  my $sth = $dbh->prepare("select sn,primer_id,plasmid_place,plate_well,stock_place,vector from _cs_transfer_result where (vector like '%$clone_type%')and primer_id=\'$primer_id\'");
   $sth->execute();
   my $ref;
   my $numRows = $sth->rows;
