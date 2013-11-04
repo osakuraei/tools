@@ -22,7 +22,7 @@ select RESULT;
 $|=1;
 
 my $thread;
-my $max_thread=70;
+my $max_thread=20;
 my $semaphore = Thread::Semaphore->new($max_thread);
 my $mutex = Thread::Semaphore->new(1);
 
