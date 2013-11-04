@@ -8,13 +8,14 @@
  my $mutex_1 = Thread::Semaphore->new(1);
  my $mutex_2 = Thread::Semaphore->new(1);
  
-if (@ARGV!=3)
+if (@ARGV!=4)
 {
-    die "please check the <mrna_ac_input> <unget_mrna__id_file> <genbankfile_output> \n";
+    die "please check the <mrna_ac_input> <unget_mrna__id_file> <genbankfile_output> <orf_fasta>\n";
 }
 
 open(NCBI_REF_AC,"<",$ARGV[0]) or die "please check the <mrna_ac_input> file \n";
 open(UNGET_MRNA_ID,">>",$ARGV[1]) or die "please check the <unget_mrna__id_file> file \n";
+
 my $GENE_ID_MRNA=$ARGV[2];
 
 
@@ -33,6 +34,10 @@ my $GENE_ID_MRNA=$ARGV[2];
     close NCBI_REF_AC;
     close UNGET_MRNA_ID;
     close $GENE_ID_MRNA;
+    
+    my @para=($ARGV[2],$ARGV[3]);
+    my @args = ($^X,'/home/db2inst1/tools/fetch_NCBI_Seq_orf_s.pl',@para);
+    system(@args) == 0 or die "system @args failed: $?";
 
 
 sub p_get
