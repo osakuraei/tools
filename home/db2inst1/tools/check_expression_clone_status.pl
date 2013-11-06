@@ -1,5 +1,6 @@
 #!/opt/ActivePerl-5.16/bin/perl
   use strict;
+  use List::MoreUtils qw(uniq);
   use DBI();
 if (@ARGV!=3)
 {
@@ -20,14 +21,19 @@ my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
     {
       chomp($primer_id);
       my $sth ="";
+      my $primer_ary_ref;
       if ($primer_id=~/^GC-/i)
       {
-	$sth = $dbh->prepare("select b.gene_id,a.sn,a.primer_id,a.plasmid_place,a.plate_well,a.stock_place,a.vector from _cs_transfer_result a,_glz_design_primer b where (a.vector like '%$clone_type%')and a.primer_id=b.primerid and b.gene_id=\'$primer_id\' limit 1");
+	my $sql1="select b.gene_id,a.sn,a.primer_id,a.plasmid_place,a.plate_well,a.stock_place,a.vector from _cs_transfer_result a,_glz_design_primer b where (a.vector like '%$clone_type%')and a.primer_id=b.primerid and b.gene_id=\'$primer_id\'";
+	$sth = $dbh->prepare( $sql1);
+	 $primer_ary_ref = $dbh->selectcol_arrayref($sql1,{ Columns=>[5]});
       }
       
       else
       {
-	$sth = $dbh->prepare("select b.gene_id,a.sn,a.primer_id,a.plasmid_place,a.plate_well,a.stock_place,a.vector from _cs_transfer_result a,_glz_design_primer b where (vector like '%$clone_type%')and a.primer_id=\'$primer_id\'and a.primer_id=b.primerid limit 1");
+	my $sql2="select b.gene_id,a.sn,a.primer_id,a.plasmid_place,a.plate_well,a.stock_place,a.vector from _cs_transfer_result a,_glz_design_primer b where (vector like '%$clone_type%')and a.primer_id=\'$primer_id\'and a.primer_id=b.primerid";
+	$sth = $dbh->prepare($sql2);
+	$primer_ary_ref = $dbh->selectcol_arrayref($sql2,{ Columns=>[5]});
       }
       $sth->execute();
       my $ref;
@@ -56,4 +62,42 @@ close PRIMER_ID;
 close RESULT;
 
 $dbh->disconnect();
+
+sub check_avi
+{
+    
+    my $platewell=shift @_;
+    chomp($platewell);
+    my $avi_hash={};
+  my $sth = $dbh->prepare("select assembly,forward_primer,reverse_primer,reverse_adapter,assembled from _ll_assembly,_ll_platewell where _ll_platewell.sn=_ll_assembly.sn and _ll_platewell.platewell=\'$platewell\' limit 1");
+  $sth->execute();
+  my $numRows = $sth->rows;
+  if($numRows>0)
+  {
+	  while (my $ref = $sth->fetchrow_hashref())
+	    {
+	        my $assembly=$ref->{'assembly'};
+	        my $forward_primer=$ref->{'forward_primer'};
+	        my $reverse_primer=$ref->{'reverse_primer'};
+	        my $reverse_adapter=$ref->{'reverse_adapter'};
+	        my $assembled=$ref->{'assembled'};
+	        my $sub_adp=substr $reverse_adapter,0,3;
+		my $avi="Y";
+		if (($assembled eq "0") or($assembled eq "8")) {
+		    $avi="N";
+		}
+		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
+	        print RESULT $platewell,"\t",$seq_orf,"\t",$avi,"\t",$assembled,"\n";
+		$avi_hash->{$platewell}={ORF=>$seq_orf,
+					 AVI=>$avi,
+					 ASE=>$assembled};
+		
+	    }
+  }
+  else
+  {     
+  }
+    
+  $sth->finish();
+}
 

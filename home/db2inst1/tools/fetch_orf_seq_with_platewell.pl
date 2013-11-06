@@ -32,13 +32,18 @@ while (my $platewell=<PLATE_WELL>)
 	        my $reverse_adapter=$ref->{'reverse_adapter'};
 	        my $assembled=$ref->{'assembled'};
 	        my $sub_adp=substr $reverse_adapter,0,3;
-	        print RESULT $platewell,"\t","ATG",$forward_primer,$assembly,$reverse_primer,$sub_adp,"\t",$assembled,"\n";
+		my $avi="Y";
+		if (($assembled eq "0") or($assembled eq "8")) {
+		    $avi="N";
+		}
+		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
+	        print RESULT $platewell,"\t",$seq_orf,"\t",$avi,"\t",$assembled,"\n";
 	    }
   }
   else
   {
         
-         print RESULT $platewell,"\t","-","\t","-","\n";
+         print RESULT $platewell,"\t","-","\t","-","\t","-","\n";
         
   }
     
