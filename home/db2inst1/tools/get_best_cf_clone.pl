@@ -69,7 +69,7 @@ else
 
 sub p_get
 	{
-		my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
+		my $dbh = DBI->connect("DBI:mysql:database=lims;host=192.168.8.10",
                          "selectonly", "fulengen",
                          {'RaiseError' => 1});
 		my $gene_id=shift @_;
@@ -164,7 +164,7 @@ sub p_get
 
 sub f_get
 	{
-					my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
+					my $dbh = DBI->connect("DBI:mysql:database=lims;host=192.168.8.10",
                          "selectonly", "fulengen",
                          {'RaiseError' => 1});
 					my $gene_id=shift @_;

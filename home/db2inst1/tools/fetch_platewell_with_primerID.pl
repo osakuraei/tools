@@ -12,7 +12,7 @@ open(PRIMER_ID,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS primer_id_file Fi
 open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE";
   # Connect to the database.
 
-my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
+my $dbh = DBI->connect("DBI:mysql:database=lims;host=192.168.8.10",
                          "selectonly", "fulengen",
                          {'RaiseError' => 1});
 while (my $primer_id=<PRIMER_ID>)

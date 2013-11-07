@@ -46,7 +46,7 @@ my $mutex = Thread::Semaphore->new(1);
 
 sub p_get
 	{
-		my $dbh = DBI->connect("DBI:mysql:database=test;host=magic.fulengen.net",
+		my $dbh = DBI->connect("DBI:mysql:database=test;host=192.168.8.10",
                          "selectonly", "fulengen",
                          {'RaiseError' => 1});
 		my $gene_id=shift @_;

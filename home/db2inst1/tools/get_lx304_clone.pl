@@ -11,7 +11,7 @@
     open(GC_ID,"<",$ARGV[0]) or die "please check the <GC_ID_input_file> \n";
     open(LX304,">", $ARGV[1]) or die "Please check the <LX304_CLone_outputfile> \n";
     
-    my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
+    my $dbh = DBI->connect("DBI:mysql:database=lims;host=192.168.8.10",
                          "selectonly", "fulengen",
                          {'RaiseError' => 1});
     

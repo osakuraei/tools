@@ -13,7 +13,7 @@ my $clone_type=uc($ARGV[1]);
 
   # Connect to the database.
 
-my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
+my $dbh = DBI->connect("DBI:mysql:database=lims;host=192.168.8.10",
                          "selectonly", "fulengen",
                          {'RaiseError' => 1});
 
@@ -21,19 +21,19 @@ my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
     {
       chomp($primer_id);
       my $sth ="";
-      my $primer_ary_ref;
+      my $platewell_ary_ref;
       if ($primer_id=~/^GC-/i)
       {
 	my $sql1="select b.gene_id,a.sn,a.primer_id,a.plasmid_place,a.plate_well,a.stock_place,a.vector from _cs_transfer_result a,_glz_design_primer b where (a.vector like '%$clone_type%')and a.primer_id=b.primerid and b.gene_id=\'$primer_id\'";
 	$sth = $dbh->prepare( $sql1);
-	 $primer_ary_ref = $dbh->selectcol_arrayref($sql1,{ Columns=>[5]});
+	 $platewell_ary_ref = $dbh->selectcol_arrayref($sql1,{ Columns=>[5]});
       }
       
       else
       {
 	my $sql2="select b.gene_id,a.sn,a.primer_id,a.plasmid_place,a.plate_well,a.stock_place,a.vector from _cs_transfer_result a,_glz_design_primer b where (vector like '%$clone_type%')and a.primer_id=\'$primer_id\'and a.primer_id=b.primerid";
 	$sth = $dbh->prepare($sql2);
-	$primer_ary_ref = $dbh->selectcol_arrayref($sql2,{ Columns=>[5]});
+	$platewell_ary_ref = $dbh->selectcol_arrayref($sql2,{ Columns=>[5]});
       }
       $sth->execute();
       my $ref;

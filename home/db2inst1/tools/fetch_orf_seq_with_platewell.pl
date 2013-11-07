@@ -12,31 +12,51 @@ open(PLATE_WELL,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS GENE_ID File";
 open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE";
   # Connect to the database.
 
-my $dbh = DBI->connect("DBI:mysql:database=lims;host=magic.fulengen.net",
+my $dbh = DBI->connect("DBI:mysql:database=lims;host=192.168.8.10",
                          "selectonly", "fulengen",
                          {'RaiseError' => 1});
 while (my $platewell=<PLATE_WELL>)
 {
   chomp($platewell);
-  
-  my $sth = $dbh->prepare("select assembly,forward_primer,reverse_primer,reverse_adapter,assembled from _ll_assembly,_ll_platewell where _ll_platewell.sn=_ll_assembly.sn and _ll_platewell.platewell=\'$platewell\' limit 1");
+  my $sql="select curated,assembly,forward_primer,reverse_primer,reverse_adapter,assembled from _ll_assembly,_ll_platewell where _ll_platewell.sn=_ll_assembly.sn and _ll_platewell.platewell=\'$platewell\' limit 1";
+  my $sth = $dbh->prepare($sql);
   $sth->execute();
   my $numRows = $sth->rows;
   if($numRows>0)
   {
 	  while (my $ref = $sth->fetchrow_hashref())
 	    {
+		my $curated=$ref->{'curated'};
 	        my $assembly=$ref->{'assembly'};
 	        my $forward_primer=$ref->{'forward_primer'};
 	        my $reverse_primer=$ref->{'reverse_primer'};
 	        my $reverse_adapter=$ref->{'reverse_adapter'};
 	        my $assembled=$ref->{'assembled'};
 	        my $sub_adp=substr $reverse_adapter,0,3;
-		my $avi="Y";
-		if (($assembled eq "0") or($assembled eq "8")) {
+		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
+		my $seq_flag="N";
+		if($seq_orf =~ /[^atcg]/i)
+		{
+		    $seq_flag="N";
+		}
+		else
+		{
+		    $seq_flag="Y";
+		}
+		my $avi="N";
+		if (($assembled eq "0") or ($assembled eq "8") or($seq_flag eq "N"))
+		{
 		    $avi="N";
 		}
-		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
+		elsif($curated eq "1")
+		{
+		    $avi="Y";
+		}
+		else
+		{
+		    $avi="TBI";
+		}
+		
 	        print RESULT $platewell,"\t",$seq_orf,"\t",$avi,"\t",$assembled,"\n";
 	    }
   }
