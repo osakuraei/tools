@@ -47,9 +47,10 @@ while (my $line=<PLATE_WELL_ORF>)
 	        my $sub_adp=uc(substr $reverse_adapter,0,3);
 		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
 		my @avi_check_pra=($assembled,$pattern,$seq_orf,$orf,$sub_adp,$curated);
-		my $avi="N";
-		$avi=&check_avi(\@avi_check_pra);
-	        print RESULT $platewell,"\t",$avi,"\n";
+
+		my $check_result=&check_avi(\@avi_check_pra);
+		my($clone_type,$avi)=@$check_result;
+	        print RESULT $platewell,"\t",$avi,"\t",$clone_type,"\n";
 	    }
   }
   else
@@ -104,7 +105,8 @@ close RESULT;
     {
 	$avi="Y";
     }
-    return $avi;
+    my @result=($clone_type,$avi);
+    return \@result;
 
   }
   
