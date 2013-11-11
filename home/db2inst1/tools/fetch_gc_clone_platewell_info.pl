@@ -77,11 +77,17 @@ close RESULT;
   
   sub check_avi
   {
+    
     my $arr=shift @_;
     my ($assembled,$pattern,$seq_orf,$orf,$sub_adp_hold,$curated,$platewell)=@$arr;
     my $sub_adp=substr $seq_orf,-3;
-    my $platewell_prt=uc(translate_as_string($seq_orf));
-    my $std_prt=uc(translate_as_string($orf));
+    my $platewell_prt="";
+    my $std_prt="";
+    eval
+    {
+	$platewell_prt=uc(translate_as_string($seq_orf));
+	$std_prt=uc(translate_as_string($orf));
+    };if($@){print STDERR $@;};
     my $clone_type="";
     my $avi="N";
     if ($sub_adp eq "TAG")
@@ -116,6 +122,7 @@ close RESULT;
     }
     my @result=($clone_type,$avi);
     return \@result;
+   
 
   }
   
