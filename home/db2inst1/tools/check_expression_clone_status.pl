@@ -63,41 +63,4 @@ close RESULT;
 
 $dbh->disconnect();
 
-sub check_avi
-{
-    
-    my $platewell=shift @_;
-    chomp($platewell);
-    my $avi_hash={};
-  my $sth = $dbh->prepare("select assembly,forward_primer,reverse_primer,reverse_adapter,assembled from _ll_assembly,_ll_platewell where _ll_platewell.sn=_ll_assembly.sn and _ll_platewell.platewell=\'$platewell\' limit 1");
-  $sth->execute();
-  my $numRows = $sth->rows;
-  if($numRows>0)
-  {
-	  while (my $ref = $sth->fetchrow_hashref())
-	    {
-	        my $assembly=$ref->{'assembly'};
-	        my $forward_primer=$ref->{'forward_primer'};
-	        my $reverse_primer=$ref->{'reverse_primer'};
-	        my $reverse_adapter=$ref->{'reverse_adapter'};
-	        my $assembled=$ref->{'assembled'};
-	        my $sub_adp=substr $reverse_adapter,0,3;
-		my $avi="Y";
-		if (($assembled eq "0") or($assembled eq "8")) {
-		    $avi="N";
-		}
-		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
-	        print RESULT $platewell,"\t",$seq_orf,"\t",$avi,"\t",$assembled,"\n";
-		$avi_hash->{$platewell}={ORF=>$seq_orf,
-					 AVI=>$avi,
-					 ASE=>$assembled};
-		
-	    }
-  }
-  else
-  {     
-  }
-    
-  $sth->finish();
-}
 

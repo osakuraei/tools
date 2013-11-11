@@ -8,12 +8,14 @@
   
 if (@ARGV!=2)
 {
-    die "please check the parameters <platewell_orf_file> <platewell_outputfile>";
+    die "please check the parameters <platewell_orf_file> <platewell_outputfile>\n";
 }
 
-open(PLATE_WELL_ORF,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS platewell_orf_file File";
+open(PLATE_WELL_ORF,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS platewell_orf_file File\n";
 
-open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE";
+open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE\n";
+
+
   # Connect to the database.
 
 my $dbh = DBI->connect("DBI:mysql:database=lims;host=192.168.8.10",
@@ -46,11 +48,11 @@ while (my $line=<PLATE_WELL_ORF>)
 	        my $assembled=$ref->{'assembled'};
 	        my $sub_adp=uc(substr $reverse_adapter,0,3);
 		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
-		my @avi_check_pra=($assembled,$pattern,$seq_orf,$orf,$sub_adp,$curated);
+		my @avi_check_pra=($assembled,$pattern,$seq_orf,$orf,$sub_adp,$curated,$platewell);
 
 		my $check_result=&check_avi(\@avi_check_pra);
 		my($clone_type,$avi)=@$check_result;
-	        print RESULT $platewell,"\t",$avi,"\t",$clone_type,"\n";
+	        print RESULT $platewell,"\t",$seq_orf,"\t",$avi,"\t",$clone_type,"\n";
 	    }
   }
   else
@@ -66,6 +68,7 @@ while (my $line=<PLATE_WELL_ORF>)
 close PLATE_WELL_ORF;
 close RESULT;
 
+
   
 
   # Disconnect from the database.
@@ -74,7 +77,8 @@ close RESULT;
   sub check_avi
   {
     my $arr=shift @_;
-    my ($assembled,$pattern,$seq_orf,$orf,$sub_adp,$curated)=@$arr;
+    my ($assembled,$pattern,$seq_orf,$orf,$sub_adp_hold,$curated,$platewell)=@$arr;
+    my $sub_adp=substr $seq_orf,-3;
     my $platewell_prt=uc(translate_as_string($seq_orf));
     my $std_prt=uc(translate_as_string($orf));
     my $clone_type="";
@@ -91,12 +95,16 @@ close RESULT;
     {
 	$clone_type="TBI";
     }
-    my @seq=($orf,$seq_orf);
-    my @assembled_curated=($assembled,$curated);
-    my $protein_avi=&check_prt_seq(\@seq);
+    my @seq_prt=($std_prt,$platewell_prt,$platewell);
+    my @seq=($orf,$seq_orf,$platewell);
+    my @assembled_curated=($assembled,$curated,$platewell);
+    my @pattern_platewell=($pattern,$platewell);
+    
+    my $protein_avi=&check_prt_seq(\@seq_prt);
     my $dna_avi=&check_dna_seq(\@seq);
-    my $pattern_avi=&check_pattern($pattern);
+    my $pattern_avi=&check_pattern(\@pattern_platewell);
     my $assembled_curated_avi=&check_assembled_curated(\@assembled_curated);
+    
     if (($protein_avi eq "N") or ($dna_avi eq "N") or ($pattern_avi eq "N") or ($assembled_curated_avi eq "N")) {
 	$avi="N";
 	
@@ -113,7 +121,7 @@ close RESULT;
 sub check_prt_seq
 {
     my $arr=shift @_;
-    my($pr1,$pr2)=@$arr;
+    my($pr1,$pr2,$platewell)=@$arr;
     my $pr1_len=length($pr1);
     my $pr2_len=length($pr2);
     
@@ -123,6 +131,7 @@ sub check_prt_seq
     my $p_rate=0;
     my $star1=0;
     my $star2=0;
+    my $check_len="Y";
 
     if ($pr1_len !=$pr2_len) {
 	$avi="N";
@@ -130,6 +139,7 @@ sub check_prt_seq
 	$star1="#";
 	$star2="#";
 	$p_rate="#";
+	$check_len="N";
 	goto CONK;
     }
     
@@ -164,6 +174,7 @@ sub check_prt_seq
     $p_rate=$count_p/$pr1_len;
     
    CONK: my $result=$avi;
+ 
     return $result;
 }
 
@@ -175,7 +186,7 @@ sub check_prt_seq
 sub check_dna_seq
 {
     my $arr=shift @_;
-    my($pr1,$pr2)=@$arr;
+    my($pr1,$pr2,$platewell)=@$arr;
     
     my $pr1_len=length($pr1);
     my $pr2_len=length($pr2);
@@ -184,22 +195,27 @@ sub check_dna_seq
     my $i=0;
     my $count_p=0;
     my $p_rate=0;
+    my $check_len="Y";
+    my $not_atcg="N";
 
 
      if ($pr1_len !=$pr2_len) {
 	$avi="N";
 	$count_p="#";
 	$p_rate="#";
+	$check_len="N";
 	goto CONK;
     }
      
     if($pr2=~ /[^atcg]/i)
     {
 	 $avi="N";
+	 $not_atcg="Y";
     }
     else
     {
 	$avi="Y";
+	$not_atcg="N";
     }
     for($i=0;$i<$pr1_len;$i++)
     {
@@ -212,12 +228,14 @@ sub check_dna_seq
     }
     $p_rate=$count_p/$pr1_len;
     CONK:my $result=$avi;
+
     return $result;
 }
 
 sub check_pattern
 {
-    my $line=shift @_;
+     my $arr=shift @_;
+     my ($line,$platewell)=@$arr;
     
 
     
@@ -294,7 +312,7 @@ sub check_pattern
 sub check_assembled_curated
 {
     my $arr=shift @_;
-    my($assembled,$curated)=@$arr;
+    my($assembled,$curated,$platewell)=@$arr;
     
     my $avi="N";
     if (($assembled eq "0") or ($assembled eq "8"))
