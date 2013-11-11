@@ -1,4 +1,5 @@
 use strict;
+use lib qw(/home/kokia/bioperl-live);
 if(@ARGV!=2)
 {
 	die "please check your <GENE_SYMOBOL_INPUTFILE> <GENE_ID_OUTPUTFILE>\n";

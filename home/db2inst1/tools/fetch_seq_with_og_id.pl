@@ -2,6 +2,8 @@
 
   use strict;
   use DBI();
+  use lib qw(/home/kokia/bioperl-live);
+  
 if (@ARGV!=2)
 {
     die "please check the parameters <OG_ID> <OG_SEQ_FILE>";

@@ -1,6 +1,7 @@
 #!/opt/ActivePerl-5.16/bin/perl
 
   use strict;
+  use lib qw(/home/kokia/bioperl-live);
   use threads;
   use threads::shared;
   use Thread::Semaphore;

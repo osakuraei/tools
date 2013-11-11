@@ -1,6 +1,7 @@
 #!/opt/ActivePerl-5.16/bin/perl
 
 use strict;
+use lib qw(/home/kokia/bioperl-live);
  my $rHoHoH = ();
  open(INPUT, "<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS INPUTFILE\n";
  open(OUTPUT, ">", $ARGV[1]) or die "PLEASE CHECK IF THERE IS OUTPUTFILE\n";

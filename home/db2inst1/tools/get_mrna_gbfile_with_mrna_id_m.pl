@@ -3,6 +3,7 @@
  use threads;
  use threads::shared;
  use Thread::Semaphore;
+ use lib qw(/home/kokia/bioperl-live);
  my $max_thread=3;
  my $semaphore = Thread::Semaphore->new($max_thread);
  my $mutex_1 = Thread::Semaphore->new(1);

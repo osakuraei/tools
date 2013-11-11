@@ -5,6 +5,7 @@
   use threads::shared;
   use Thread::Semaphore;
   use DBI();
+  use lib qw(/home/kokia/bioperl-live);
   my @ary :shared;
 if (@ARGV!=3)
 {

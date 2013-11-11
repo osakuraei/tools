@@ -2,6 +2,7 @@
 
   use strict;
   use DBI();
+  use lib qw(/home/kokia/bioperl-live);
   use Bio::Seq;
   use Bio::SeqIO;
   use Bio::Perl;
@@ -10,7 +11,8 @@ if (@ARGV!=2)
 {
     die "please check the parameters <gc_id_orf_file> <platewell_outputfile>\n";
 }
-
+my %hash_hold=();
+my %hash_check=();
 open(PLATE_WELL_ORF,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS platewell_orf_file File\n";
 
 open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE\n";
@@ -26,7 +28,7 @@ while (my $line=<PLATE_WELL_ORF>)
  
   chomp($line);
   my($platewell, $orf)=split /	/,$line;
-  
+  $hash_hold{$platewell}="-";
   my $sql="select sn,pattern, curated,assembly,forward_primer,reverse_primer,reverse_adapter,assembled from _ll_assembly where gene_id='$platewell'";
   my $sth = $dbh->prepare($sql);
   $sth->execute();
@@ -50,20 +52,34 @@ while (my $line=<PLATE_WELL_ORF>)
 	        my $sub_adp=uc(substr $reverse_adapter,0,3);
 		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
 		my @avi_check_pra=($assembled,$pattern,$seq_orf,$orf,$sub_adp,$curated,$platewell);
-
+		
+		
 		my $check_result=&check_avi(\@avi_check_pra);
 		my($clone_type,$avi)=@$check_result;
-	        print RESULT $platewell,"\t",$SN,"\t",$seq_orf,"\t",$avi,"\t",$clone_type,"\n";
+		if ((($clone_type eq "GC") or ($clone_type eq "CF")) and ($avi eq "Y"))
+		{
+		    print RESULT $platewell,"\t",$SN,"\t",$seq_orf,"\t",$clone_type,"\t",$avi,"\n";
+		    $hash_check{$platewell}="-";
+		}
+
 	    }
+	   
   }
   else
   {
-        
-         print RESULT $platewell,"\t","-","\t","-","\t","-","\t","-","\n";
-        
+	$hash_check{$platewell}="-";
+        print RESULT $platewell,"\t","-","\t","-","\t","-","\t","-","\n";     
   }
     
   $sth->finish();
+}
+
+foreach my $key(sort keys %hash_hold)
+{
+    if (not exists $hash_check{$key})
+    {
+	print RESULT $key,"\t","-","\t","-","\t","-","\t","-","\n";
+    }	
 }
 
 close PLATE_WELL_ORF;
@@ -79,7 +95,9 @@ close RESULT;
   {
     
     my $arr=shift @_;
-    my ($assembled,$pattern,$seq_orf,$orf,$sub_adp_hold,$curated,$platewell)=@$arr;
+    my ($assembled,$pattern,$seq_orf_o,$orf_o,$sub_adp_hold,$curated,$platewell)=@$arr;
+    my $orf=uc($orf_o);
+    my $seq_orf=uc($seq_orf_o);
     my $sub_adp=substr $seq_orf,-3;
     my $platewell_prt="";
     my $std_prt="";
@@ -141,7 +159,7 @@ sub check_prt_seq
     my $star2=0;
     my $check_len="Y";
 
-    if ($pr1_len !=$pr2_len) {
+    if (($pr1_len !=$pr2_len) or($pr1_len==0)or($pr2_len==0)) {
 	$avi="N";
 	$count_p="#";
 	$star1="#";
@@ -207,7 +225,7 @@ sub check_dna_seq
     my $not_atcg="N";
 
 
-     if ($pr1_len !=$pr2_len) {
+     if (($pr1_len !=$pr2_len) or($pr1_len==0)or($pr2_len==0)) {
 	$avi="N";
 	$count_p="#";
 	$p_rate="#";

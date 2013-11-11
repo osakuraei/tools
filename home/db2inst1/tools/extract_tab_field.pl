@@ -1,5 +1,6 @@
 #!/opt/ActivePerl-5.16/bin/perl
 use strict;
+use lib qw(/home/kokia/bioperl-live);
 if(@ARGV!=2)
 {
 	die "please check your INPUTFILE OUTPUTFILE\n";

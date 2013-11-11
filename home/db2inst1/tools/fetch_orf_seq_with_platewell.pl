@@ -1,6 +1,7 @@
 #!/opt/ActivePerl-5.16/bin/perl
 
   use strict;
+  use lib qw(/home/kokia/bioperl-live);
   use DBI();
   use Bio::Seq;
   use Bio::SeqIO;
@@ -14,6 +15,7 @@ if (@ARGV!=2)
 open(PLATE_WELL_ORF,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS platewell_orf_file File\n";
 
 open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE\n";
+
 
 
   # Connect to the database.
@@ -69,6 +71,7 @@ close PLATE_WELL_ORF;
 close RESULT;
 
 
+
   
 
   # Disconnect from the database.
@@ -79,8 +82,13 @@ close RESULT;
     my $arr=shift @_;
     my ($assembled,$pattern,$seq_orf,$orf,$sub_adp_hold,$curated,$platewell)=@$arr;
     my $sub_adp=substr $seq_orf,-3;
-    my $platewell_prt=uc(translate_as_string($seq_orf));
-    my $std_prt=uc(translate_as_string($orf));
+    my $platewell_prt="";
+    my $std_prt="";
+    eval
+    {
+	$platewell_prt=uc(translate_as_string($seq_orf));
+	$std_prt=uc(translate_as_string($orf));
+    };if($@){print STDERR $@;};
     my $clone_type="";
     my $avi="N";
     if ($sub_adp eq "TAG")
@@ -133,7 +141,7 @@ sub check_prt_seq
     my $star2=0;
     my $check_len="Y";
 
-    if ($pr1_len !=$pr2_len) {
+    if (($pr1_len !=$pr2_len) or($pr1_len==0)or($pr2_len==0)) {
 	$avi="N";
 	$count_p="#";
 	$star1="#";
@@ -174,7 +182,7 @@ sub check_prt_seq
     $p_rate=$count_p/$pr1_len;
     
    CONK: my $result=$avi;
- 
+
     return $result;
 }
 
@@ -199,7 +207,7 @@ sub check_dna_seq
     my $not_atcg="N";
 
 
-     if ($pr1_len !=$pr2_len) {
+     if (($pr1_len !=$pr2_len)  or($pr1_len==0)or($pr2_len==0)) {
 	$avi="N";
 	$count_p="#";
 	$p_rate="#";
@@ -229,6 +237,7 @@ sub check_dna_seq
     $p_rate=$count_p/$pr1_len;
     CONK:my $result=$avi;
 
+    
     return $result;
 }
 

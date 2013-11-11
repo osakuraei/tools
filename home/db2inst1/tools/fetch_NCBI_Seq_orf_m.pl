@@ -1,8 +1,7 @@
 #!/opt/ActivePerl-5.16/bin/perl
-
- use lib qw(/home/kokia/bioperl-live);
  
  use strict;
+ use lib qw(/home/kokia/bioperl-live);
  use Bio::DB::GenBank;
  use Bio::Seq;
  use Bio::SeqIO;

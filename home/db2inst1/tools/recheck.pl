@@ -1,5 +1,5 @@
 use strict;
-use lib qw(E:\bioperl-live);
+use lib qw(/home/kokia/bioperl-live);
 use Bio::Seq;
 use Bio::SeqIO;
 use Bio::Perl;

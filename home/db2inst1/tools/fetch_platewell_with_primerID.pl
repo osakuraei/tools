@@ -2,6 +2,8 @@
 
   use strict;
   use DBI();
+  use lib qw(/home/kokia/bioperl-live);
+  
 if (@ARGV!=2)
 {
     die "please check the parameters <primer_id_file> <platewell_outputfile>";

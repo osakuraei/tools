@@ -1,5 +1,6 @@
 #!/opt/ActivePerl-5.16/bin/perl
   use strict;
+  use lib qw(/home/kokia/bioperl-live);
   use List::MoreUtils qw(uniq);
   use DBI();
 if (@ARGV!=3)

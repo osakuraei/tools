@@ -1,6 +1,7 @@
 #!/opt/ActivePerl-5.16/bin/perl
     use strict;
     use DBI();
+    use lib qw(/home/kokia/bioperl-live);
     my $hash_ref={};
     my $gc_id="";
     my $product_id_lv="";

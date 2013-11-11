@@ -2,6 +2,7 @@
 
   use strict;
   use DBI();
+  use lib qw(/home/kokia/bioperl-live);
 if (@ARGV!=3)
 {
     die "please check the parameters <gene_id_file> <OC_outputfile1> <OG_outputfile2>";

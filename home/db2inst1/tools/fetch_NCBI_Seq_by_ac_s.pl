@@ -1,8 +1,10 @@
 #!/opt/ActivePerl-5.16/bin/perl
 
- use lib qw(/home/kokia/bioperl-live);
  
  use strict;
+ 
+ use lib qw(/home/kokia/bioperl-live);
+ 
  if (@ARGV!=3) {
     die "please check the argument <NCBI_Accession_Number> <output_file_name_genbank_format> <LEFT_ID_FILE> \n";
  }

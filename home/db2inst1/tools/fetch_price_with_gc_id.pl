@@ -2,6 +2,7 @@
 
   use strict;
   use DBI();
+  use lib qw(/home/kokia/bioperl-live);
   my $hash_ref={};
 if (@ARGV!=4)
 {
