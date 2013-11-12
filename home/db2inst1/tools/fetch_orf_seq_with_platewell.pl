@@ -7,16 +7,16 @@
   use Bio::SeqIO;
   use Bio::Perl;
   
-if (@ARGV!=2)
+if (@ARGV!=3)
 {
-    die "please check the parameters <platewell_orf_file> <platewell_outputfile>\n";
+    die "please check the parameters <platewell_id_orf_file> <platewell_outputfile> <QA_REPORT>\n";
 }
 
 open(PLATE_WELL_ORF,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS platewell_orf_file File\n";
 
 open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE\n";
 
-
+open(QAREPORT,">>",$ARGV[2]) or die "PLEASE CHECK IF THERE IS A QAREPORT OUTPUTFILE\n";
 
   # Connect to the database.
 
@@ -69,7 +69,7 @@ while (my $line=<PLATE_WELL_ORF>)
 
 close PLATE_WELL_ORF;
 close RESULT;
-
+close QAREPORT;
 
 
   
@@ -80,7 +80,9 @@ close RESULT;
   sub check_avi
   {
     my $arr=shift @_;
-    my ($assembled,$pattern,$seq_orf,$orf,$sub_adp_hold,$curated,$platewell)=@$arr;
+    my ($assembled,$pattern,$seq_orf_o,$orf_o,$sub_adp_hold,$curated,$platewell)=@$arr;
+    my $orf=uc($orf_o);
+    my $seq_orf=uc($seq_orf_o);    
     my $sub_adp=substr $seq_orf,-3;
     my $platewell_prt="";
     my $std_prt="";
@@ -180,9 +182,11 @@ sub check_prt_seq
         }
     }
     $p_rate=$count_p/$pr1_len;
-    
-   CONK: my $result=$avi;
+      
+    CONK: my $result=$avi;
 
+   print QAREPORT $platewell,"\t","PROTEIN","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$star2,"\t",$avi,"\n";
+   
     return $result;
 }
 
@@ -237,6 +241,8 @@ sub check_dna_seq
     $p_rate=$count_p/$pr1_len;
     CONK:my $result=$avi;
 
+    print QAREPORT $platewell,"\t","DNA","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$not_atcg,"\t",$avi,"\n";
+    print QAREPORT "\n";
     
     return $result;
 }

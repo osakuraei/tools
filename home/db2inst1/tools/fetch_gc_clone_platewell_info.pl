@@ -7,9 +7,9 @@
   use Bio::SeqIO;
   use Bio::Perl;
   
-if (@ARGV!=2)
+if (@ARGV!=3)
 {
-    die "please check the parameters <gc_id_orf_file> <platewell_outputfile>\n";
+    die "please check the parameters <gc_id_orf_file> <platewell_outputfile> <QA_REPORT>\n";
 }
 my %hash_hold=();
 my %hash_check=();
@@ -17,6 +17,7 @@ open(PLATE_WELL_ORF,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS platewell_or
 
 open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE\n";
 
+open(QAREPORT,">>",$ARGV[2]) or die "PLEASE CHECK IF THERE IS A QAREPORT OUTPUTFILE\n";
 
   # Connect to the database.
 
@@ -51,7 +52,7 @@ while (my $line=<PLATE_WELL_ORF>)
 	        my $assembled=$ref->{'assembled'};
 	        my $sub_adp=uc(substr $reverse_adapter,0,3);
 		my $seq_orf="ATG".$forward_primer.$assembly.$reverse_primer.$sub_adp;
-		my @avi_check_pra=($assembled,$pattern,$seq_orf,$orf,$sub_adp,$curated,$platewell);
+		my @avi_check_pra=($assembled,$pattern,$seq_orf,$orf,$sub_adp,$curated,$platewell,$SN);
 		
 		
 		my $check_result=&check_avi(\@avi_check_pra);
@@ -84,6 +85,7 @@ foreach my $key(sort keys %hash_hold)
 
 close PLATE_WELL_ORF;
 close RESULT;
+close QAREPORT;
 
 
   
@@ -95,7 +97,7 @@ close RESULT;
   {
     
     my $arr=shift @_;
-    my ($assembled,$pattern,$seq_orf_o,$orf_o,$sub_adp_hold,$curated,$platewell)=@$arr;
+    my ($assembled,$pattern,$seq_orf_o,$orf_o,$sub_adp_hold,$curated,$platewell,$SN)=@$arr;
     my $orf=uc($orf_o);
     my $seq_orf=uc($seq_orf_o);
     my $sub_adp=substr $seq_orf,-3;
@@ -120,10 +122,10 @@ close RESULT;
     {
 	$clone_type="TBI";
     }
-    my @seq_prt=($std_prt,$platewell_prt,$platewell);
-    my @seq=($orf,$seq_orf,$platewell);
-    my @assembled_curated=($assembled,$curated,$platewell);
-    my @pattern_platewell=($pattern,$platewell);
+    my @seq_prt=($std_prt,$platewell_prt,$platewell,$SN);
+    my @seq=($orf,$seq_orf,$platewell,$SN);
+    my @assembled_curated=($assembled,$curated,$platewell,$SN);
+    my @pattern_platewell=($pattern,$platewell,$SN);
     
     my $protein_avi=&check_prt_seq(\@seq_prt);
     my $dna_avi=&check_dna_seq(\@seq);
@@ -147,7 +149,7 @@ close RESULT;
 sub check_prt_seq
 {
     my $arr=shift @_;
-    my($pr1,$pr2,$platewell)=@$arr;
+    my($pr1,$pr2,$platewell,$SN)=@$arr;
     my $pr1_len=length($pr1);
     my $pr2_len=length($pr2);
     
@@ -200,7 +202,7 @@ sub check_prt_seq
     $p_rate=$count_p/$pr1_len;
     
    CONK: my $result=$avi;
- 
+    print QAREPORT $platewell,"\t",$SN,"\t","PROTEIN","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$star2,"\t",$avi,"\n";
     return $result;
 }
 
@@ -212,7 +214,7 @@ sub check_prt_seq
 sub check_dna_seq
 {
     my $arr=shift @_;
-    my($pr1,$pr2,$platewell)=@$arr;
+    my($pr1,$pr2,$platewell,$SN)=@$arr;
     
     my $pr1_len=length($pr1);
     my $pr2_len=length($pr2);
@@ -254,14 +256,15 @@ sub check_dna_seq
     }
     $p_rate=$count_p/$pr1_len;
     CONK:my $result=$avi;
-
+    print QAREPORT $platewell,"\t",$SN,"\t","DNA","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$not_atcg,"\t",$avi,"\n";
+    print QAREPORT "\n";
     return $result;
 }
 
 sub check_pattern
 {
      my $arr=shift @_;
-     my ($line,$platewell)=@$arr;
+     my ($line,$platewell,$SN)=@$arr;
     
 
     
@@ -338,7 +341,7 @@ sub check_pattern
 sub check_assembled_curated
 {
     my $arr=shift @_;
-    my($assembled,$curated,$platewell)=@$arr;
+    my($assembled,$curated,$platewell,$SN)=@$arr;
     
     my $avi="N";
     if (($assembled eq "0") or ($assembled eq "8"))
