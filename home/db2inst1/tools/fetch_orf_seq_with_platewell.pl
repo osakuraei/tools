@@ -86,11 +86,7 @@ close QAREPORT;
     my $sub_adp=substr $seq_orf,-3;
     my $platewell_prt="";
     my $std_prt="";
-    eval
-    {
-	$platewell_prt=uc(translate_as_string($seq_orf));
-	$std_prt=uc(translate_as_string($orf));
-    };if($@){print STDERR $@;};
+
     my $clone_type="";
     my $avi="N";
     if ($sub_adp eq "TAG")
@@ -105,6 +101,36 @@ close QAREPORT;
     {
 	$clone_type="TBI";
     }
+    
+    
+    my $rear_3nts=substr $seq_orf,-3;
+    
+    if ($rear_3nts eq "TAG")
+    {
+	my $l=length($orf);
+	my $tmp_len=$l-3;
+	my $pr1_tmp=substr $orf,0,$tmp_len;
+	$orf=$pr1_tmp."TAG";
+
+    }
+    elsif($rear_3nts eq "TAC")
+    {
+	my $l=length($orf);
+	my $tmp_len=$l-3;
+	my $pr1_tmp=substr $orf,0,$tmp_len;
+	$orf=$pr1_tmp."TAC";	
+    }
+    else
+    {
+	
+    }
+    
+    eval
+    {
+	$platewell_prt=uc(translate_as_string($seq_orf));
+	$std_prt=uc(translate_as_string($orf));
+    };if($@){print STDERR $@;};
+    
     my @seq_prt=($std_prt,$platewell_prt,$platewell);
     my @seq=($orf,$seq_orf,$platewell);
     my @assembled_curated=($assembled,$curated,$platewell);
@@ -229,6 +255,7 @@ sub check_dna_seq
 	$avi="Y";
 	$not_atcg="N";
     }
+        
     for($i=0;$i<$pr1_len;$i++)
     {
         my $chr1=substr $pr1,$i,1;
@@ -311,7 +338,7 @@ sub check_pattern
          $pI+=$1;
     }
     
-    if (($D>0)or($I>0)or($pD>0)or($pP>0)or($pI>0)) {
+    if (($D>0)or($I>0)or($pD>0)or($pI>0)) {
 	$avi="N";
     }
     else
