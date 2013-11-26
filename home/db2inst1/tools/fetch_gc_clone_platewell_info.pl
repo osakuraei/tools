@@ -13,6 +13,10 @@ if (@ARGV!=3)
 }
 my %hash_hold=();
 my %hash_check=();
+my $dna_checker={};
+my %gc_id_holder=();
+my $gc_clone_container={};
+
 open(PLATE_WELL_ORF,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS platewell_orf_file File\n";
 
 open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE\n";
@@ -60,6 +64,10 @@ while (my $line=<PLATE_WELL_ORF>)
 		if ((($clone_type eq "GC") or ($clone_type eq "CF")) and ($avi eq "Y"))
 		{
 		    print RESULT $platewell,"\t",$SN,"\t",$seq_orf,"\t",$clone_type,"\t",$avi,"\n";
+		    $gc_id_holder{$platewell}="-";
+		    $gc_clone_container->{$platewell}->{$SN}={SEQ=>$seq_orf,
+							      TYPE=>$clone_type,
+							      AVI=>$avi};
 		    $hash_check{$platewell}="-";
 		}
 
@@ -81,6 +89,38 @@ foreach my $key(sort keys %hash_hold)
     {
 	print RESULT $key,"\t","-","\t","-","\t","-","\t","-","\n";
     }	
+}
+
+foreach my $key1(sort keys %gc_id_holder)
+{
+    my $count_p=0;
+    my $flag=0;
+    my $tmp_count_p=0;
+    my $tmp_platewell="";
+    my $temp_sn="";
+    foreach my $key2(sort keys %{$gc_clone_container->{$key1}} )
+    {
+	
+	$count_p=$dna_checker->{$key1}->{$key2};
+	if ($flag==0) {
+	    $tmp_count_p=$count_p;
+	    $tmp_platewell=$key1;
+	    $temp_sn=$key2;
+	}
+	else
+	{
+	    if ($count_p<$tmp_count_p)
+	    {
+		$tmp_platewell=$key1;
+		$temp_sn=$key2;
+	    }
+	    $tmp_count_p=$count_p;
+	    
+	}
+	$flag=1;
+	
+    }
+    print RESULT $tmp_platewell,"\t",$temp_sn,"\t",$gc_clone_container->{$tmp_platewell}->{$temp_sn}->{SEQ},"\t",$gc_clone_container->{$tmp_platewell}->{$temp_sn}->{TYPE},"\t",$gc_clone_container->{$tmp_platewell}->{$temp_sn}->{AVI},"\n";
 }
 
 close PLATE_WELL_ORF;
@@ -230,7 +270,7 @@ sub check_prt_seq
     $p_rate=$count_p/$pr1_len;
     
    CONK: my $result=$avi;
-    print QAREPORT $platewell,"\t",$SN,"\t","PROTEIN","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$star2,"\t",$avi,"\n";
+    print QAREPORT $platewell,"\t",$SN,"\t","PROTEIN","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$star2,"\t",$avi,"\t|\t";
     return $result;
 }
 
@@ -288,7 +328,12 @@ sub check_dna_seq
     $p_rate=$count_p/$pr1_len;
     CONK:my $result=$avi;
     print QAREPORT $platewell,"\t",$SN,"\t","DNA","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$not_atcg,"\t",$avi,"\n";
-    print QAREPORT "\n";
+  
+    if ($count_p=~/[0-9]+/)
+    {
+      $dna_checker->{$platewell}->{$SN}=$count_p;
+    }
+    
     return $result;
 }
 

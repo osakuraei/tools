@@ -275,7 +275,7 @@ sub out_file
 					}
 					else
 					{
-					    $flag=0;
+					    $flag=4;
 					}
 					my $pri_flag=$rHoHoH->{$gene_id}->{FLAG};
 					if ($pri_flag<$flag) {
@@ -294,7 +294,16 @@ sub out_file
 	
     for my $key ( sort keys %$rHoHoH )
     {
-	print RESULT $key,"\t",$rHoHoH->{$key}->{TEL_AC},"\t",$rHoHoH->{$key}->{TEL_ID},"\t",$rHoHoH->{$key}->{TEL_WELL},"\t",$rHoHoH->{$key}->{AV},"\t",$rHoHoH->{$key}->{FLAG},"\n";
+	my $tel_id=$rHoHoH->{$key}->{TEL_ID};
+	if ($tel_id=~/MGC.*/)
+	    {
+		print RESULT $key,"\t",$rHoHoH->{$key}->{TEL_AC},"\t",$rHoHoH->{$key}->{TEL_ID},"\t",$rHoHoH->{$key}->{TEL_WELL},"\t",$rHoHoH->{$key}->{AV},"\t",$rHoHoH->{$key}->{FLAG},"\n";
+	    }
+	else
+	{
+		print RESULT $key,"\t","-","\t","-","\t","-","\t","-","\t","-","\n";
+	}
+	
     }
 
 }

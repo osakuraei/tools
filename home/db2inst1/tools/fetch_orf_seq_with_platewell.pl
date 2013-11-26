@@ -211,7 +211,7 @@ sub check_prt_seq
       
     CONK: my $result=$avi;
 
-   print QAREPORT $platewell,"\t","PROTEIN","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$star2,"\t",$avi,"\n";
+   print QAREPORT $platewell,"\t","PROTEIN","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$star2,"\t",$avi,"\t|\t";
    
     return $result;
 }
@@ -269,7 +269,7 @@ sub check_dna_seq
     CONK:my $result=$avi;
 
     print QAREPORT $platewell,"\t","DNA","\t",$pr1_len,"\t",$count_p,"\t",$p_rate,"\t",$not_atcg,"\t",$avi,"\n";
-    print QAREPORT "\n";
+   
     
     return $result;
 }
