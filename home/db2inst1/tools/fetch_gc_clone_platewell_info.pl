@@ -17,6 +17,9 @@ my $dna_checker={};
 my %gc_id_holder=();
 my $gc_clone_container={};
 
+my %cf_id_holder=();
+my $cf_clone_container={};
+
 open(PLATE_WELL_ORF,"<", $ARGV[0]) or die "PLEASE CHECK IF THERE IS platewell_orf_file File\n";
 
 open(RESULT,">>",$ARGV[1]) or die "PLEASE CHECK IF THERE IS AN OUTPUTFILE\n";
@@ -64,10 +67,26 @@ while (my $line=<PLATE_WELL_ORF>)
 		if ((($clone_type eq "GC") or ($clone_type eq "CF")) and ($avi eq "Y"))
 		{
 		    print RESULT $platewell,"\t",$SN,"\t",$seq_orf,"\t",$clone_type,"\t",$avi,"\n";
-		    $gc_id_holder{$platewell}="-";
-		    $gc_clone_container->{$platewell}->{$SN}={SEQ=>$seq_orf,
+		    if ($clone_type eq "GC")
+		    {
+			$gc_id_holder{$platewell}="-";
+			$gc_clone_container->{$platewell}->{$SN}={SEQ=>$seq_orf,
 							      TYPE=>$clone_type,
 							      AVI=>$avi};
+		    }
+		    elsif($clone_type eq "CF")
+		    {
+			$cf_id_holder{$platewell}="-";
+			$cf_clone_container->{$platewell}->{$SN}={SEQ=>$seq_orf,
+							      TYPE=>$clone_type,
+							      AVI=>$avi};
+		    }
+		    else
+		    {
+			
+		    }
+		    
+		    
 		    $hash_check{$platewell}="-";
 		}
 
@@ -122,6 +141,40 @@ foreach my $key1(sort keys %gc_id_holder)
     }
     print RESULT $tmp_platewell,"\t",$temp_sn,"\t",$gc_clone_container->{$tmp_platewell}->{$temp_sn}->{SEQ},"\t",$gc_clone_container->{$tmp_platewell}->{$temp_sn}->{TYPE},"\t",$gc_clone_container->{$tmp_platewell}->{$temp_sn}->{AVI},"\n";
 }
+
+
+foreach my $key1(sort keys %cf_id_holder)
+{
+    my $count_p=0;
+    my $flag=0;
+    my $tmp_count_p=0;
+    my $tmp_platewell="";
+    my $temp_sn="";
+    foreach my $key2(sort keys %{$cf_clone_container->{$key1}} )
+    {
+	
+	$count_p=$dna_checker->{$key1}->{$key2};
+	if ($flag==0) {
+	    $tmp_count_p=$count_p;
+	    $tmp_platewell=$key1;
+	    $temp_sn=$key2;
+	}
+	else
+	{
+	    if ($count_p<$tmp_count_p)
+	    {
+		$tmp_platewell=$key1;
+		$temp_sn=$key2;
+	    }
+	    $tmp_count_p=$count_p;
+	    
+	}
+	$flag=1;
+	
+    }
+    print RESULT $tmp_platewell,"\t",$temp_sn,"\t",$cf_clone_container->{$tmp_platewell}->{$temp_sn}->{SEQ},"\t",$cf_clone_container->{$tmp_platewell}->{$temp_sn}->{TYPE},"\t",$cf_clone_container->{$tmp_platewell}->{$temp_sn}->{AVI},"\n";
+}
+
 
 close PLATE_WELL_ORF;
 close RESULT;

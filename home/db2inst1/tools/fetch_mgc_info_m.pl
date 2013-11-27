@@ -8,6 +8,9 @@
   use DBI();
   my @ary :shared;
   my $rHoHoH ={};
+  my $dbh_fl_info = DBI->connect("DBI:mysql:database=lims;host=192.168.8.10",
+                         "selectonly", "fulengen",
+                         {'RaiseError' => 1});
 if (@ARGV!=2)
 {
     die "please check the parameters:\t<gc_id>\t<mgc_template_outputfile>\n";
@@ -253,7 +256,7 @@ sub out_file
 		    $rHoHoH->{$gene_id}->{TEL_ID}=$tel_id;
 		    $rHoHoH->{$gene_id}->{TEL_WELL}=$tel_wel;
 		    $rHoHoH->{$gene_id}->{AV}=$av;
-		    $rHoHoH->{$gene_id}->{FLAG}=0;
+		    $rHoHoH->{$gene_id}->{FLAG}=4;
 			
 		}
 		
@@ -278,7 +281,7 @@ sub out_file
 					    $flag=4;
 					}
 					my $pri_flag=$rHoHoH->{$gene_id}->{FLAG};
-					if ($pri_flag<$flag) {
+					if ($pri_flag>$flag) {
 					    
 					    $rHoHoH->{$gene_id}->{TEL_AC}=$tel_ac;
 					    $rHoHoH->{$gene_id}->{TEL_ID}=$tel_id;
@@ -295,9 +298,34 @@ sub out_file
     for my $key ( sort keys %$rHoHoH )
     {
 	my $tel_id=$rHoHoH->{$key}->{TEL_ID};
+	
 	if ($tel_id=~/MGC.*/)
 	    {
-		print RESULT $key,"\t",$rHoHoH->{$key}->{TEL_AC},"\t",$rHoHoH->{$key}->{TEL_ID},"\t",$rHoHoH->{$key}->{TEL_WELL},"\t",$rHoHoH->{$key}->{AV},"\t",$rHoHoH->{$key}->{FLAG},"\n";
+		my $tel_ac=$rHoHoH->{$key}->{TEL_AC};
+		my $sql="select a.fl_id as FL_ID,a.fl_acc as ACC,b.cds_start as START,b.cds_stop as STOP,b.seq as SEQ from fl_info as a, fl_seq as b where a.fl_id=b.fl_id and a.fl_acc='$tel_ac'";
+		my $sth = $dbh_fl_info->prepare("$sql");
+		$sth->execute();
+		my $numRows = $sth->rows;
+		my $fl_id="-";
+		my $template_seq="-";
+		if ($numRows>0)
+		{
+		     while (my $ref = $sth->fetchrow_hashref())
+		     {
+			$fl_id=$ref->{'FL_ID'};
+			my $start=$ref->{'START'};
+			my $stop=$ref->{'STOP'};
+			my $seq=$ref->{'SEQ'};
+			my $offset_seq=$start-1;
+			my $len_seq=abs($stop-$start+1);
+			$template_seq=substr $seq,$offset_seq,$len_seq;
+			
+		     }
+		    
+		}
+		
+		
+		print RESULT $key,"\t",$fl_id,"\t",$rHoHoH->{$key}->{TEL_AC},"\t",$rHoHoH->{$key}->{TEL_ID},"\t",$rHoHoH->{$key}->{TEL_WELL},"\t",$template_seq,"\t",$rHoHoH->{$key}->{AV},"\t",$rHoHoH->{$key}->{FLAG},"\n";
 	    }
 	else
 	{
