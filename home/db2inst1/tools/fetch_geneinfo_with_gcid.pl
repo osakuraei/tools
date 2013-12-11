@@ -22,14 +22,14 @@ while (my $gc_id=<GC_ID>)
 {
   chomp($gc_id);
   
-  my $sth = $dbh->prepare("select gb_acc,(cds_stop-cds_start+1)as orf_len,gene_symb,LocusID,name from gene where gene_id=\'$gc_id\' limit 1");
+  my $sth = $dbh->prepare("select concat(gb_acc,\".\",version) as ac_ver,(cds_stop-cds_start+1)as orf_len,gene_symb,LocusID,name from gene where gene_id=\'$gc_id\' limit 1");
   $sth->execute();
   my $numRows = $sth->rows;
   if($numRows>0)
   {
 	  while (my $ref = $sth->fetchrow_hashref())
 	    {
-	        my $acc=$ref->{'gb_acc'};
+	        my $acc=$ref->{'ac_ver'};
 	        my $orf_len=$ref->{'orf_len'};
 	        my $gene_symbol=$ref->{'gene_symb'};
 	        my $gene_id=$ref->{'LocusID'};

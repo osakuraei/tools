@@ -30,20 +30,23 @@ while (my $gene_id=<GENE_ID>)
 	  while (my $ref = $sth->fetchrow_hashref())
 	    {
 	        my $ORFeome_product_id=$ref->{'ORFeome_product_id'};
-		my $checker=&status_checker($ORFeome_product_id);
+		
 	        my $sth1 = $dbh->prepare("SELECT ORF_seq  from _glz_ORFeome_seq  where ORFeome_product_id=\'$ORFeome_product_id\' limit 1");
+		my $checker=&status_checker($ORFeome_product_id);
+		my $stop_codon_status=&stop_codon_checker($ORFeome_product_id);
 	        $sth1->execute();
 	        while (my $ref1 = $sth1->fetchrow_hashref())
 	        {
 	            my $seq=$ref1->{'ORF_seq'};
-	            print RESULT $gene_id,"\t",$ORFeome_product_id,"\t",$seq,"\t","$checker","\n";
+		    #print $ORFeome_product_id,"\t",$stop_codon_status,"\n";
+	            print RESULT $gene_id,"\t",$ORFeome_product_id,"\t",$seq,"\t",$stop_codon_status,"\t","$checker","\n";
 	        }
 	        $sth1->finish();
 	    }
   }
   else
   {
-     print RESULT $gene_id,"\t","-","\t","-","\t","N","\n";
+     print RESULT $gene_id,"\t","-","\t","-","\t","-","\t","N","\n";
   }
     
 
@@ -89,7 +92,23 @@ close RESULT1;
   $dbh->disconnect();
   
   
-  
+sub stop_codon_checker
+{
+    my $product_id_en=shift @_;
+    my $stop_codon_status="-";
+     my $stop_codon_sth = $dbh->prepare("select  stop_codon  from _glz_ORFeome_clone_product where ORFeome_product_id=\'$product_id_en\' limit 1");
+    $stop_codon_sth->execute();
+    my $numRows = $stop_codon_sth->rows;
+    if($numRows>0)
+    {
+	 while (my $ref3 =$stop_codon_sth->fetchrow_hashref())
+        {
+            my $stop_status=$ref3->{'stop_codon'};
+	    $stop_codon_status=$stop_status;
+        }
+    }
+    return $stop_codon_status;
+}
 sub status_checker
 {
     my $template_id=shift @_;
